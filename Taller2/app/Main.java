@@ -3,6 +3,9 @@ package app;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 import Dominio.Jugador;
 
@@ -86,7 +89,7 @@ public class Main {
 				switch(opcion) {
 				case 1: 
 					   break;
-			    case 2: salirCapturar();
+			    case 2: salirCapturar(entrada);
 				}
 				
 			}while(opcion < 1 || opcion > 8);
@@ -95,13 +98,16 @@ public class Main {
 		}
 	}
 	
-	static void salirCapturar() {
-		eligirHabitat();
+	static void salirCapturar(Scanner entrada) {
+		String habitat = eligirHabitat(entrada);
+		captura(entrada, habitat);
+		
 	}
 	
-	static void eligirHabitat() {
-		String opcion;
-		int c = 1;
+	static String eligirHabitat(Scanner entrada) {
+		int opcion;
+		int c = 0;
+		List<String> habitats = new ArrayList<String>();
 		
 		try {
 			
@@ -111,16 +117,35 @@ public class Main {
 			System.out.println("Zonas disponibles:\n");
 			
 			while(lector.hasNextLine()) {
+				c++;
 				String linea = lector.nextLine();
 				System.out.println(c+")"+linea);
-				c++;
+				habitats.add(linea);
 			}
 			
+			System.out.println();
 			lector.close();
+			
+			do {
+				System.out.println("Ingrese Zona: ");
+				opcion = Integer.parseInt(entrada.nextLine());
+			}while(opcion < 1 || opcion > c);
+			
+			String eleccion = habitats.get(opcion-1);
+			
+			return eleccion;
 			
 		}catch(Exception e) {
 			System.out.println("ERROR. No se pudo hayar el archivo "+e.getMessage());
+			return null;
 		}
+		
+	}
+	
+	static void captura(Scanner entrada, String habitat) {
+		Random r = new Random();
+		double num = r.nextDouble();
+		System.out.println(num);
 		
 	}
 
