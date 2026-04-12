@@ -1,0 +1,127 @@
+package app;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.util.Scanner;
+import Dominio.Jugador;
+
+public class Main {
+	public static void main(String[] args) {
+		//Nombre: Eugenio Cortés Egaña; Rut: 22.405.687-7
+		//Nombre: Matías Nuñez Gonzales; Rut:
+		
+		Scanner entrada = new Scanner(System.in);
+		menu(entrada);
+		
+		
+		entrada.close();
+		
+		
+	}
+	
+	static void menu(Scanner entrada) {
+		int opcion = 0;
+		
+		System.out.println("1) Continuar\n2) Nueva Partida\n3) Salir");
+		
+		try {
+			do {
+				opcion = Integer.parseInt(entrada.nextLine());
+				
+				switch(opcion) {
+				case 1:
+					   break;
+					   
+				case 2: crearUsuario(entrada);
+				        break;
+				        
+				case 3: break;
+				}
+			}while(opcion < 1 || opcion > 3);
+			
+		}catch(Exception e){
+			System.out.println("ERROR. Valor Ingresado Invalido");
+		}
+		
+	}
+	
+	static void crearUsuario(Scanner entrada) {
+		String apodo;
+		System.out.print("Ingrese su Apodo: ");
+		
+		do {
+			apodo = entrada.nextLine();
+		}while(apodo.equals(""));
+		
+		Jugador e = new Jugador(apodo);
+		
+		try {
+			
+			String arch = "txts/Registros (1).txt";
+			FileWriter escritor = new FileWriter(arch);
+			escritor.write(apodo+";"+e.getMedallas());
+			escritor.close();
+			
+		}catch (Exception e2) {
+			System.out.println("ERROR. Escritura de archivo mal realizada.");
+		}
+		
+		System.out.printf("\nBienvenido %s\n",apodo);
+		System.out.println();
+		
+		menUsuario(entrada, e);
+		
+	}
+	
+	static void menUsuario(Scanner entrada, Jugador user) {
+		System.out.println(user.getUser()+", que deseas hacer?");
+		int opcion = 0;
+		
+		try {
+			do {
+				System.out.println("\n1) Revisar equipo.\n2) Salir a capturar.\n3) Acceso al PC (cambiar Pokemon del equipo).\n4) Retar un gimnasio\n5) Desafío al Alto Mando.\n6) Curar Pokémon.\n7) Guardar.\n8) Guardar y Salir.");
+				opcion = Integer.parseInt(entrada.nextLine());
+				
+				switch(opcion) {
+				case 1: 
+					   break;
+			    case 2: salirCapturar();
+				}
+				
+			}while(opcion < 1 || opcion > 8);
+		}catch(Exception e) {
+			System.out.println("ERROR. Valor Ingresado erroneo "+e.getMessage());
+		}
+	}
+	
+	static void salirCapturar() {
+		eligirHabitat();
+	}
+	
+	static void eligirHabitat() {
+		String opcion;
+		int c = 1;
+		
+		try {
+			
+			File file = new File("txts/Habitats.txt");
+			Scanner lector = new Scanner(file);
+			System.out.println("¿Donde deseas ir a explorar?\n");
+			System.out.println("Zonas disponibles:\n");
+			
+			while(lector.hasNextLine()) {
+				String linea = lector.nextLine();
+				System.out.println(c+")"+linea);
+				c++;
+			}
+			
+			lector.close();
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. No se pudo hayar el archivo "+e.getMessage());
+		}
+		
+	}
+
+}
