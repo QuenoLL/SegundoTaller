@@ -3,7 +3,7 @@ package Dominio;
 public class Jugador {
 	
 	private String user;
-	private int medallas;
+	private String medallas;
 	private Pokemon[] equipo;
 	
 	public Jugador(String user) {
@@ -22,13 +22,15 @@ public class Jugador {
 		return user;
 	}
 
-	public int getMedallas() {
+	public String getMedallas() {
 		return medallas;
 	}
 
-	public void setMedallas(int medallas) {
+	public void setMedallas(String medallas) {
 		this.medallas = medallas;
 	}
+
+	
 	
 	
 	

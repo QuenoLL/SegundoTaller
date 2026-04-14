@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import Dominio.Jugador;
+import Dominio.Pokemon;
 
 public class Main {
 	public static void main(String[] args) {
 		//Nombre: Eugenio Cortés Egaña; Rut: 22.405.687-7
-		//Nombre: Matías Nuñez Gonzales; Rut:
+		//Nombre: Matías Núñez González; Rut: 22.256.666-5
 		
 		Scanner entrada = new Scanner(System.in);
 		menu(entrada);
@@ -23,6 +24,7 @@ public class Main {
 		
 	}
 	
+	//Menu principal 
 	static void menu(Scanner entrada) {
 		int opcion = 0;
 		
@@ -49,6 +51,7 @@ public class Main {
 		
 	}
 	
+	//Crear usuario (deriva a menu de usuario)
 	static void crearUsuario(Scanner entrada) {
 		String apodo;
 		System.out.print("Ingrese su Apodo: ");
@@ -77,6 +80,7 @@ public class Main {
 		
 	}
 	
+	//Menu de usuario
 	static void menUsuario(Scanner entrada, Jugador user) {
 		System.out.println(user.getUser()+", que deseas hacer?");
 		int opcion = 0;
@@ -98,12 +102,14 @@ public class Main {
 		}
 	}
 	
+	//Capturar pokemon
 	static void salirCapturar(Scanner entrada) {
 		String habitat = eligirHabitat(entrada);
 		captura(entrada, habitat);
 		
 	}
 	
+	//Derivada de Captura
 	static String eligirHabitat(Scanner entrada) {
 		int opcion;
 		int c = 0;
@@ -142,10 +148,75 @@ public class Main {
 		
 	}
 	
+	//Captura Pokemom (ejercicio)
 	static void captura(Scanner entrada, String habitat) {
 		Random r = new Random();
-		double num = r.nextDouble();
+		double minimo = 0;
+		double maximo = 1.0;
+		
+		double num = minimo + (maximo - minimo) * r.nextDouble();
 		System.out.println(num);
+		
+		List<Double> probabilidades = new ArrayList<>();
+		List<Pokemon> pokemonParalela = new ArrayList<Pokemon>();
+		
+		double suma = 0;
+		
+		try {
+			File file = new File("txts/Pokedex.txt");
+			Scanner lector = new Scanner(file);
+			
+			while(lector.hasNextLine()) {
+				
+				String linea = lector.nextLine();
+				String[] partes = linea.split(";");
+				
+				String nombre = partes[0];
+				double intervalo = Double.parseDouble(partes[2]);
+				
+				int vida = Integer.parseInt(partes[3]);
+				int ataque = Integer.parseInt(partes[4]);
+				int defensa = Integer.parseInt(partes[5]);
+				int ataqueEspecial = Integer.parseInt(partes[6]);
+				int defensaEspecial = Integer.parseInt(partes[7]);
+				int velocidad = Integer.parseInt(partes[8]);
+				
+				int stats = vida + ataque + defensa + ataqueEspecial + defensaEspecial + velocidad;
+				String habitats = partes[1];
+				String tipo = partes[8];
+				
+				Pokemon e = new Pokemon(nombre, habitats, intervalo, stats, tipo, "Vivo");
+				
+				if(habitat.equalsIgnoreCase(partes[1])) {
+					suma += e.getPorcAparicion();
+					probabilidades.add(suma);
+					pokemonParalela.add(e);
+					
+				}	
+			}
+			
+			lector.close();
+			
+			int indice = 0;
+			for(int i = 1; i < probabilidades.size(); i++) {
+				if(num < probabilidades.get(i) && num > probabilidades.get(i-1)) {
+					indice = i;
+					break;
+				}else if(num < probabilidades.get(i) && num > 0){
+					indice = 0;
+					break;
+				}
+			}
+
+			System.out.printf("\nOH!!! Ha aparecido un increible %s salvaje!!!", pokemonParalela.get(indice).getNombre());
+			
+			
+			//Double limiteInferior = probabilidades.get(0);
+			//Double limiteMayor = probabilidades.get(probabilidades.size()-1);
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. No se encontro el archivo "+e.getMessage());
+		}
 		
 	}
 
