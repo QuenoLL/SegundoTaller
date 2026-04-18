@@ -1,3 +1,4 @@
+
 package app;
 
 import java.io.File;
@@ -35,8 +36,8 @@ public class Main {
 				opcion = Integer.parseInt(entrada.nextLine());
 				
 				switch(opcion) {
-				case 1:
-					   break;
+				case 1: 
+					    break;
 					   
 				case 2: crearUsuario(entrada);
 				        break;
@@ -73,7 +74,7 @@ public class Main {
 			System.out.println("ERROR. Escritura de archivo mal realizada.");
 		}
 		
-		System.out.printf("\nBienvenido %s\n",apodo);
+		System.out.printf("\nBienvenido %s",apodo);
 		System.out.println();
 		
 		menUsuario(entrada, e);
@@ -82,30 +83,47 @@ public class Main {
 	
 	//Menu de usuario
 	static void menUsuario(Scanner entrada, Jugador user) {
-		System.out.println(user.getUser()+", que deseas hacer?");
 		int opcion = 0;
 		
-		try {
-			do {
-				System.out.println("\n1) Revisar equipo.\n2) Salir a capturar.\n3) Acceso al PC (cambiar Pokemon del equipo).\n4) Retar un gimnasio\n5) Desafío al Alto Mando.\n6) Curar Pokémon.\n7) Guardar.\n8) Guardar y Salir.");
-				opcion = Integer.parseInt(entrada.nextLine());
-				
-				switch(opcion) {
-				case 1: 
-					   break;
-			    case 2: salirCapturar(entrada);
-				}
-				
-			}while(opcion < 1 || opcion > 8);
-		}catch(Exception e) {
-			System.out.println("ERROR. Valor Ingresado erroneo "+e.getMessage());
+		while(true) {
+			try {
+				do {
+					System.out.println("\n"+user.getUser()+", que deseas hacer?");
+					System.out.println("\n1) Revisar equipo.\n2) Salir a capturar.\n3) Acceso al PC (cambiar Pokemon del equipo).\n4) Retar un gimnasio\n5) Desafío al Alto Mando.\n6) Curar Pokémon.\n7) Guardar.\n8) Guardar y Salir.");
+					opcion = Integer.parseInt(entrada.nextLine());
+					
+					switch(opcion) {
+					case 1: revisarEquipo(user);
+						    break;
+				    case 2: salirCapturar(entrada,user);
+				            break;
+					}
+					
+				}while(opcion < 1 || opcion > 8);
+			}catch(Exception e) {
+				System.out.println("ERROR. Valor Ingresado erroneo "+e.getMessage());
+			}
 		}
 	}
 	
 	//Capturar pokemon
-	static void salirCapturar(Scanner entrada) {
+	static void salirCapturar(Scanner entrada, Jugador user) {
 		String habitat = eligirHabitat(entrada);
-		captura(entrada, habitat);
+		captura(entrada, habitat, user);
+		
+		try {
+			String arch = "txts/Registros (1).txt";
+			FileWriter escritor = new FileWriter(arch,true);
+			Pokemon ultimo = user.getEquipo().get(user.getEquipo().size()-1);
+			escritor.write("\n"+ultimo.getNombre()+";"+ultimo.getEstado());//Agrega la linea con salto en linea "\n" de modo que llamo a los atrubutos del pokemon.
+			escritor.close();
+			
+			System.out.println("\n"+ultimo.getNombre()+" ha sido agregado a tu equipo! XD");
+			
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. Registro fallido "+e.getMessage());
+		}
 		
 	}
 	
@@ -149,7 +167,7 @@ public class Main {
 	}
 	
 	//Captura Pokemom (ejercicio)
-	static void captura(Scanner entrada, String habitat) {
+	static void captura(Scanner entrada, String habitat, Jugador user) {
 		Random r = new Random();
 		double minimo = 0;
 		double maximo = 1.0;
@@ -166,7 +184,7 @@ public class Main {
 			File file = new File("txts/Pokedex.txt");
 			Scanner lector = new Scanner(file);
 			
-			while(lector.hasNextLine()) {
+			while(lector.hasNextLine()) {//Dentro de este while solo creo los pokemones de manera que creo instancias para hacer el randomizado.
 				
 				String linea = lector.nextLine();
 				String[] partes = linea.split(";");
@@ -183,15 +201,14 @@ public class Main {
 				
 				int stats = vida + ataque + defensa + ataqueEspecial + defensaEspecial + velocidad;
 				String habitats = partes[1];
-				String tipo = partes[8];
+				String tipo = partes[9];
 				
 				Pokemon e = new Pokemon(nombre, habitats, intervalo, stats, tipo, "Vivo");
 				
 				if(habitat.equalsIgnoreCase(partes[1])) {
 					suma += e.getPorcAparicion();
 					probabilidades.add(suma);
-					pokemonParalela.add(e);
-					
+					pokemonParalela.add(e);	
 				}	
 			}
 			
@@ -210,14 +227,34 @@ public class Main {
 
 			System.out.printf("\nOH!!! Ha aparecido un increible %s salvaje!!!", pokemonParalela.get(indice).getNombre());
 			
+		    System.out.println("\n¿Que deseas hacer?\n");
+		    System.out.println("1) Capturar\n2) Huir");
+		    System.out.println("Ingrese opcion: ");
+			int opcion = Integer.parseInt(entrada.nextLine());
 			
-			//Double limiteInferior = probabilidades.get(0);
-			//Double limiteMayor = probabilidades.get(probabilidades.size()-1);
+			switch(opcion) {
+			
+			case 1: user.agregarPokemon(pokemonParalela.get(indice));
+					break;
+					
+			case 2: menUsuario(entrada, user);
+			       
+			}
 			
 		}catch(Exception e) {
 			System.out.println("ERROR. No se encontro el archivo "+e.getMessage());
 		}
 		
 	}
+	
+	static void revisarEquipo(Jugador user) {
+		int c = 1;
+		System.out.println();
+		for(Pokemon i : user.getEquipo()) {
+			System.out.println(c+"|"+i.getNombre()+"|"+i.getTipo()+"|Stats totales: "+i.getStats());
+			c++;
+		}
+	}
+	
 
 }

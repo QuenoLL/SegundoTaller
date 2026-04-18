@@ -1,1 +1,3 @@
-Manugo;null
+lalo;null
+Aerodactyl;Vivo
+Tyranitar;Vivo

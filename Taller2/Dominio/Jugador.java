@@ -1,21 +1,20 @@
 package Dominio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Jugador {
 	
 	private String user;
 	private String medallas;
-	private Pokemon[] equipo;
+	private List<Pokemon> equipo = new ArrayList<Pokemon>();
 	
 	public Jugador(String user) {
 		this.user = user;
 	}
-
-	public Pokemon[] getEquipo() {
+	
+	public List<Pokemon> getEquipo() {
 		return equipo;
-	}
-
-	public void setEquipo(Pokemon[] equipo) {
-		this.equipo = equipo;
 	}
 
 	public String getUser() {
@@ -28,6 +27,11 @@ public class Jugador {
 
 	public void setMedallas(String medallas) {
 		this.medallas = medallas;
+	}
+	
+	public void agregarPokemon(Pokemon e) {
+		this.equipo.add(e);
+		System.out.println(equipo.get(equipo.size()-1).getNombre()+" Capturado con exito!!! XD");
 	}
 
 	
