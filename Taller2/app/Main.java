@@ -12,6 +12,9 @@ import Dominio.Jugador;
 import Dominio.Pokemon;
 
 public class Main {
+	
+	static List<Pokemon> listaPokemonesPc;
+	
 	public static void main(String[] args) {
 		//Nombre: Eugenio Cortés Egaña; Rut: 22.405.687-7
 		//Nombre: Matías Núñez González; Rut: 22.256.666-5
@@ -96,6 +99,8 @@ public class Main {
 					case 1: revisarEquipo(user);
 						    break;
 				    case 2: salirCapturar(entrada,user);
+				            break;
+				    case 3: revisarPc(entrada,user);
 				            break;
 					}
 					
@@ -254,6 +259,10 @@ public class Main {
 			System.out.println(c+"|"+i.getNombre()+"|"+i.getTipo()+"|Stats totales: "+i.getStats());
 			c++;
 		}
+	}
+	
+	static void revisarPc(Scanner entrada, Jugador user) {
+		
 	}
 	
 
