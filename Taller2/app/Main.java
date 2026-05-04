@@ -237,13 +237,16 @@ public class Main {
 		    System.out.println("Ingrese opcion: ");
 			int opcion = Integer.parseInt(entrada.nextLine());
 			
-			switch(opcion) {
-			
-			case 1: user.agregarPokemon(pokemonParalela.get(indice));
-					break;
-					
-			case 2: menUsuario(entrada, user);
-			       
+			switch (opcion) {
+			case 1:
+				if(user.getEquipo().size() < 7) {
+					user.agregarPokemon(pokemonParalela.get(indice));
+				}
+				break;
+
+			case 2:
+				menUsuario(entrada, user);
+
 			}
 			
 		}catch(Exception e) {
@@ -252,6 +255,7 @@ public class Main {
 		
 	}
 	
+	//Printeo del equipo del jugador, los primeros 6 de la pc...
 	static void revisarEquipo(Jugador user) {
 		int c = 1;
 		System.out.println();
@@ -262,6 +266,96 @@ public class Main {
 	}
 	
 	static void revisarPc(Scanner entrada, Jugador user) {
+		
+		try {
+			File file = new File("txts/Registros (1).txt");
+			Scanner lector = new Scanner(file);
+			int c = 1;
+			
+			String linea = lector.nextLine();
+			
+			while(lector.hasNextLine()) {
+				linea = lector.nextLine();
+				String[] partes = linea.split(";");
+				String nombre = partes[0];
+				
+				System.out.println(c+".- "+nombre);
+				
+				c++;		
+			}
+			lector.close();
+			
+			System.out.println("1) Cambiar Pokemon\n2) Salir");
+			System.out.print("> ");
+			int opcion = Integer.parseInt(entrada.nextLine());
+			
+			switch(opcion) {
+			case 1:
+				cambiarPokemon(entrada,user,c);
+				break;
+			case 2:
+				break;
+			}
+		
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. "+e.getMessage());
+		}
+	}
+	
+	static void cambiarPokemon(Scanner entrada, Jugador user,int cantidadP) {
+		int posicion1, posicion2;
+		
+		try {
+			do {
+				System.out.println("Ingrese su posicion 1 a intercambiar:");
+				System.out.print("> ");
+				posicion1 = Integer.parseInt(entrada.nextLine());
+			}while(posicion1 < 1 || posicion1 > cantidadP );
+			
+			do {
+				System.out.println("Ingrese su posicion 2 a intercambiar:");
+				System.out.print("> ");
+				posicion2 = Integer.parseInt(entrada.nextLine());
+			}while(posicion2 < 1 || posicion2 > cantidadP );
+			
+			//Lineas a cambiar...
+			String linea1 = conseguirLinea(posicion1);
+			String linea2 = conseguirLinea(posicion2);
+			
+			String arch = "txts/Registros (1).txt";
+			FileWriter escritor = new FileWriter(arch,true);
+			
+			
+			
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. "+e.getMessage());
+		}
+	}
+	
+	//Obtener las lineas a intercambiar...
+	static String conseguirLinea(int n) {
+		Scanner lector = null;
+		try {
+			File file = new File("txts/Registros (1).txt");
+			lector = new Scanner(file);
+			String linea = null;
+			
+			for(int i = 0; i < n; i++) {
+				if(!lector.hasNextLine()) {
+					return null;
+				}
+			}
+			return linea;
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. "+e.getMessage());
+		}finally {
+			if(lector != null) lector.close();
+		}
+		
+		return null;
 		
 	}
 	

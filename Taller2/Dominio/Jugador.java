@@ -33,6 +33,7 @@ public class Jugador {
 		this.equipo.add(e);
 		System.out.println(equipo.get(equipo.size()-1).getNombre()+" Capturado con exito!!! XD");
 	}
+	
 
 	
 	

@@ -1,3 +1,4 @@
 lalo;null
-Aerodactyl;Vivo
-Tyranitar;Vivo
+Psyduck;Vivo
+Whiscash;Vivo
+Azumarill;Vivo
