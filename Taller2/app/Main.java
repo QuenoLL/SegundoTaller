@@ -333,13 +333,13 @@ public class Main {
 				System.out.print("> ");
 				posicion2 = Integer.parseInt(entrada.nextLine());
 			} while (posicion2 < 1 || posicion2 > cantidadP);
-
+			
 			// Lineas a cambiar...
 			String linea1 = conseguirLinea(posicion1);
 			System.out.println(linea1);
 			String linea2 = conseguirLinea(posicion2);
 			System.out.println(linea2);
-
+			user.cambiarEquipo(posicion1, posicion2);
 			// Nuevamente leemos el archivo
 			File file = new File("txts/Registros (1).txt");
 			Scanner lector = new Scanner(file);
@@ -400,7 +400,8 @@ public class Main {
 
 	}
 
+	
+
 }
 
-//REVISAR EQUIPO, (INCOMPLETO)
-//Prueba de cambio de nombre de usuario para el commit
+//Habrá que cambiar los registros??

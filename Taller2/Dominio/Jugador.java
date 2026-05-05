@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Jugador {
-	
+
 	private String user;
 	private String medallas;
 	private List<Pokemon> equipo = new ArrayList<Pokemon>();
-	
+
 	public Jugador(String user) {
 		this.user = user;
 	}
-	
+
 	public List<Pokemon> getEquipo() {
 		return equipo;
 	}
@@ -28,19 +28,20 @@ public class Jugador {
 	public void setMedallas(String medallas) {
 		this.medallas = medallas;
 	}
-	
+
 	public void agregarPokemon(Pokemon e) {
 		this.equipo.add(e);
-		System.out.println(equipo.get(equipo.size()-1).getNombre()+" Capturado con exito!!! XD");
-	}
-	
+		System.out.println(equipo.get(equipo.size() - 1).getNombre() + " Capturado con exito!!! XD");
 
-	
-	
-	
-	
-	
-	
-	
+	}
+
+	public void cambiarEquipo(int posicion1, int posicion2) {
+		Pokemon aux = equipo.get(posicion1 - 1);
+		equipo.set(posicion1 - 1, equipo.get(posicion2 - 1));
+		equipo.set(posicion2 - 1, aux);
+		for(int i = 0; i < equipo.size(); i++) {
+			System.out.println(equipo.get(i).getNombre());
+		}
+	}
 
 }
