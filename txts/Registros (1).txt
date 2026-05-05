@@ -1,4 +1,3 @@
-lalo;null
-Psyduck;Vivo
+keno;null
+Zubat;Vivo
 Whiscash;Vivo
-Azumarill;Vivo
