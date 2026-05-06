@@ -1,1 +1,4 @@
-mateo;null
+eugenius;null
+Quagsire;Vivo
+Gengar;Vivo
+Azumarill;Vivo

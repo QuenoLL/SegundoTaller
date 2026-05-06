@@ -56,6 +56,7 @@ public class Main {
 				Pokemon e = new Pokemon(nombre, habitats, intervalo, stats, tipo, "Vivo");
 				listaPokemonesPc.add(e);
 			}
+			lector.close();
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 		}
@@ -164,8 +165,8 @@ public class Main {
 	// Menu de usuario
 	static void menUsuario(Scanner entrada, Jugador user) {
 		int opcion = 0;
-
-		while (true) {
+		boolean indicador = false;
+		while (!indicador) {
 			try {
 				do {
 					System.out.println("\n" + user.getUser() + ", que deseas hacer?");
@@ -183,8 +184,17 @@ public class Main {
 					case 3:
 						revisarPc(entrada, user);
 						break;
+					
+					case 6:
+						curarPokemon(user);
+						break;
 					case 7: 
-						guardarPartida();
+						guardarPartida(indicador);
+						break;
+					case 8:
+						guardarPartida(indicador);
+						indicador = true;
+						break;
 					}
 
 				} while (opcion < 1 || opcion > 8);
@@ -194,7 +204,44 @@ public class Main {
 		}
 	}
 	//Guardar Partida
-	static void guardarPartida() {
+	static void guardarPartida(boolean indicador) {
+		try {
+			//Lectura del archivo y llenado del array
+			
+			File file = new File("txts/Registros (1).txt");
+			Scanner lector = new Scanner(file);
+			String lineaSaltada = lector.nextLine();
+			
+			List<String> escrituraArchivo = new ArrayList<String>();
+			while (lector.hasNextLine()) {
+				String linea = lector.nextLine();
+				escrituraArchivo.add(linea);
+			}	
+		
+			String arch = "txts/Registros (1).txt";
+			FileWriter escritor = new FileWriter(arch);
+			escritor.write(lineaSaltada);
+			for(int i = 0; i < escrituraArchivo.size(); i++) {
+				escritor.write("\n" + escrituraArchivo.get(i));
+			} escritor.close();
+			
+			if (indicador = false) {
+				System.out.println("\nPARTIDA GUARDADA EXITOSAMENTE!!!!!!!!!!!!!");
+				
+			}else System.out.println("\n SALISTE Y GUARDASTE EXITOSAMENTE LA PARTIDA");
+
+			lector.close();
+		} catch (Exception e) {
+			System.out.println("ERROR. " + e.getMessage());
+		}
+		}
+	
+	
+	static void curarPokemon(Jugador user) {
+		for(Pokemon pokemon:user.getEquipo()) {
+			pokemon.setEstado("Vivo");
+		}
+		System.out.println("\n Has curado exitosamente a todos tus pokemones "); //Podriamos indicar a cuales se curó
 		
 	}
 	
@@ -387,16 +434,22 @@ public class Main {
 			} while (posicion2 < 1 || posicion2 > cantidadP);
 
 			// Lineas a cambiar...
+			
 			String linea1 = conseguirLinea(posicion1);
 			System.out.println(linea1);
+			
 			String linea2 = conseguirLinea(posicion2);
 			System.out.println(linea2);
+			
 			user.cambiarEquipo(posicion1, posicion2);
+			
 			// Nuevamente leemos el archivo
+			
 			File file = new File("txts/Registros (1).txt");
 			Scanner lector = new Scanner(file);
 			String linea = lector.nextLine();
 			String lineaSaltada = linea;
+			
 			List<String> escrituraArchivo = new ArrayList<String>();
 			while (lector.hasNextLine()) {
 				linea = lector.nextLine();
@@ -404,9 +457,11 @@ public class Main {
 				if (linea.equalsIgnoreCase(linea1)) {
 					escrituraArchivo.add(linea2);
 					System.out.println("CAMBIÉ");
+					
 				} else if (linea.equalsIgnoreCase(linea2)) {
 					escrituraArchivo.add(linea1);
 					System.out.println("CAMBIÉ");
+					
 				} else {
 					escrituraArchivo.add(linea);
 					System.out.println("ESTOY CAMBIANDO");
@@ -418,6 +473,7 @@ public class Main {
 			String arch = "txts/Registros (1).txt";
 			FileWriter escritor = new FileWriter(arch);
 			escritor.write(lineaSaltada);
+			
 			for (int i = 0; i < escrituraArchivo.size(); i++) {
 				escritor.write("\n" + escrituraArchivo.get(i));
 			}
