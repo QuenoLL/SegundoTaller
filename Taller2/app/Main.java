@@ -38,8 +38,8 @@ public class Main {
 
 				switch (opcion) {
 				case 1:
-//					continuarMenu(entrada);
-//					break;
+					continuarMenu(entrada);
+					break;
 
 				case 2:
 					crearUsuario(entrada);
@@ -58,11 +58,20 @@ public class Main {
 
 	// Continuar carga datos y deriva a menú de usuario
 
-//	static void continuarMenu() {
-//		String apodo;
-//		menUsuario(entrada, apodo);
-//
-//	}
+	static void continuarMenu(Scanner entrada) {
+		try {
+			File file = new File("txts/Registros (1).txt");
+			Scanner lector = new Scanner(file);
+			String linea = lector.nextLine();
+			String[] partes = linea.split(",");
+			String nombre = partes[0];
+			Jugador jugadorCargado = new Jugador(nombre);
+			lector.close();
+			menUsuario(entrada, jugadorCargado);
+		}catch(Exception e) {
+		System.out.println("ERROR" + e.getMessage());
+		}
+	}
 
 	// Crear usuario (deriva a menu de usuario)
 	static void crearUsuario(Scanner entrada) {
