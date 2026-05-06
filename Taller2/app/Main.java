@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+
+import Dominio.Gimnasio;
 import Dominio.Jugador;
 import Dominio.Pokemon;
 
 public class Main {
 
 	static List<Pokemon> listaPokemonesPc = new ArrayList<Pokemon>();
+	static List<Gimnasio> listaGimnasios = new ArrayList<Gimnasio>();
 
 	public static void main(String[] args) {
 		// Nombre: Eugenio Cortés Egaña; Rut: 22.405.687-7
@@ -21,6 +24,7 @@ public class Main {
 
 		Scanner entrada = new Scanner(System.in);
 		leerPokedex();
+		leerGimnasios();
 		menu(entrada);
 
 		entrada.close();
@@ -63,6 +67,44 @@ public class Main {
 
 	}
 
+	static void leerGimnasios() {
+		try {
+			File file = new File("txts/Gimnasios.txt");
+			Scanner lector = new Scanner(file);
+
+			while (lector.hasNextLine()) {
+
+				String linea = lector.nextLine();
+				String[] partes = linea.split(";");
+
+				int numGimnasio = Integer.parseInt(partes[0]);
+				String lider = partes[1];
+				String estado = partes[2];
+				int cantidadPokemones = Integer.parseInt(partes[3]);
+
+				List<Pokemon> pokemones = new ArrayList<Pokemon>();
+
+				for (int i = 0; i < cantidadPokemones; i++) {
+					for (Pokemon pokemon : listaPokemonesPc) {
+
+						if (pokemon.getNombre().equalsIgnoreCase(partes[i + 4])) {
+							pokemones.add(pokemon);
+
+						}
+					}
+
+				}
+				Gimnasio gym = new Gimnasio(numGimnasio, lider, estado, cantidadPokemones, pokemones);
+				listaGimnasios.add(gym);
+
+			}
+			lector.close();
+
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+		}
+	}
+
 	static void menu(Scanner entrada) {
 		int opcion = 0;
 
@@ -98,18 +140,15 @@ public class Main {
 		try {
 			File file = new File("txts/Registros (1).txt");
 			Scanner lector = new Scanner(file);
-			
-			
+
 			String primeralinea = lector.nextLine();
 			String[] partes = primeralinea.split(";");
-			
+
 			String nombre = partes[0];
 			String medallas = partes[1];
 			Jugador jugadorCargado = new Jugador(nombre);
 			jugadorCargado.setMedallas(medallas);
-			
-			
-			
+
 			while (lector.hasNextLine()) {
 				String linea = lector.nextLine();
 				String[] partes2 = linea.split(";");
@@ -118,16 +157,15 @@ public class Main {
 				for (Pokemon pokemon : listaPokemonesPc) {
 					if (pokemon.getNombre().equalsIgnoreCase(nombrePokemon)) {
 						pokemon.setEstado(estado);
-						
+
 						jugadorCargado.agregarPokemon(pokemon, true);
 					}
 				}
 			}
-			
+
 			lector.close();
 			menUsuario(entrada, jugadorCargado);
-			
-			
+
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 		}
@@ -184,11 +222,15 @@ public class Main {
 					case 3:
 						revisarPc(entrada, user);
 						break;
-					
+
+					case 4:
+						retarGimnasio();
+						break;
+
 					case 6:
 						curarPokemon(user);
 						break;
-					case 7: 
+					case 7:
 						guardarPartida(indicador);
 						break;
 					case 8:
@@ -203,48 +245,67 @@ public class Main {
 			}
 		}
 	}
-	//Guardar Partida
+
+	// Formato de reto a gimnasio
+	static void retarGimnasio() {
+
+		try {
+			int contador = 1;
+			for (Gimnasio gym : listaGimnasios) {
+				
+				System.out.println( contador + ") " + gym.getLider() + " - Estado: " );
+				contador++;
+			}
+			System.out.println("9) Volver al menu.");
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+		}
+	}
+
+	// Guardar Partida
+
 	static void guardarPartida(boolean indicador) {
 		try {
-			//Lectura del archivo y llenado del array
-			
+			// Lectura del archivo y llenado del array
+
 			File file = new File("txts/Registros (1).txt");
 			Scanner lector = new Scanner(file);
 			String lineaSaltada = lector.nextLine();
-			
+
 			List<String> escrituraArchivo = new ArrayList<String>();
 			while (lector.hasNextLine()) {
 				String linea = lector.nextLine();
 				escrituraArchivo.add(linea);
-			}	
-		
+			}
+
 			String arch = "txts/Registros (1).txt";
 			FileWriter escritor = new FileWriter(arch);
 			escritor.write(lineaSaltada);
-			for(int i = 0; i < escrituraArchivo.size(); i++) {
+			for (int i = 0; i < escrituraArchivo.size(); i++) {
 				escritor.write("\n" + escrituraArchivo.get(i));
-			} escritor.close();
-			
+			}
+			escritor.close();
+
 			if (indicador = false) {
 				System.out.println("\nPARTIDA GUARDADA EXITOSAMENTE!!!!!!!!!!!!!");
-				
-			}else System.out.println("\n SALISTE Y GUARDASTE EXITOSAMENTE LA PARTIDA");
+
+			} else
+				System.out.println("\n SALISTE Y GUARDASTE EXITOSAMENTE LA PARTIDA");
 
 			lector.close();
 		} catch (Exception e) {
 			System.out.println("ERROR. " + e.getMessage());
 		}
-		}
-	
-	
+	}
+
 	static void curarPokemon(Jugador user) {
-		for(Pokemon pokemon:user.getEquipo()) {
+		for (Pokemon pokemon : user.getEquipo()) {
 			pokemon.setEstado("Vivo");
 		}
-		System.out.println("\n Has curado exitosamente a todos tus pokemones "); //Podriamos indicar a cuales se curó
-		
+		System.out.println("\n Has curado exitosamente a todos tus pokemones "); // Podriamos indicar a cuales se curó
+
 	}
-	
+
 	// Capturar pokemon
 	static void salirCapturar(Scanner entrada, Jugador user) {
 		String habitat = eligirHabitat(entrada);
@@ -321,15 +382,14 @@ public class Main {
 		double suma = 0;
 
 		try {
-			for (Pokemon pokemon:listaPokemonesPc) {
-				
+			for (Pokemon pokemon : listaPokemonesPc) {
+
 				if (habitat.equalsIgnoreCase(pokemon.getHabitat())) {
 					suma += pokemon.getPorcAparicion();
 					probabilidades.add(suma);
 					pokemonParalela.add(pokemon);
 				}
 			}
-
 
 			int indice = 0;
 			for (int i = 1; i < probabilidades.size(); i++) {
@@ -434,22 +494,22 @@ public class Main {
 			} while (posicion2 < 1 || posicion2 > cantidadP);
 
 			// Lineas a cambiar...
-			
+
 			String linea1 = conseguirLinea(posicion1);
 			System.out.println(linea1);
-			
+
 			String linea2 = conseguirLinea(posicion2);
 			System.out.println(linea2);
-			
+
 			user.cambiarEquipo(posicion1, posicion2);
-			
+
 			// Nuevamente leemos el archivo
-			
+
 			File file = new File("txts/Registros (1).txt");
 			Scanner lector = new Scanner(file);
 			String linea = lector.nextLine();
 			String lineaSaltada = linea;
-			
+
 			List<String> escrituraArchivo = new ArrayList<String>();
 			while (lector.hasNextLine()) {
 				linea = lector.nextLine();
@@ -457,11 +517,11 @@ public class Main {
 				if (linea.equalsIgnoreCase(linea1)) {
 					escrituraArchivo.add(linea2);
 					System.out.println("CAMBIÉ");
-					
+
 				} else if (linea.equalsIgnoreCase(linea2)) {
 					escrituraArchivo.add(linea1);
 					System.out.println("CAMBIÉ");
-					
+
 				} else {
 					escrituraArchivo.add(linea);
 					System.out.println("ESTOY CAMBIANDO");
@@ -473,7 +533,7 @@ public class Main {
 			String arch = "txts/Registros (1).txt";
 			FileWriter escritor = new FileWriter(arch);
 			escritor.write(lineaSaltada);
-			
+
 			for (int i = 0; i < escrituraArchivo.size(); i++) {
 				escritor.write("\n" + escrituraArchivo.get(i));
 			}
