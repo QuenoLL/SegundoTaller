@@ -1,3 +1,1 @@
-paltapenegordo;null
-Garganacl;Vivo
-Magikarp;Vivo
+mateo;null

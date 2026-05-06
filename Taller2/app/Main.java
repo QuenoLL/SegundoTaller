@@ -13,13 +13,14 @@ import Dominio.Pokemon;
 
 public class Main {
 
-	static List<Pokemon> listaPokemonesPc;
+	static List<Pokemon> listaPokemonesPc = new ArrayList<Pokemon>();
 
 	public static void main(String[] args) {
 		// Nombre: Eugenio Cortés Egaña; Rut: 22.405.687-7
 		// Nombre: Matías Núñez González; Rut: 22.256.666-5
 
 		Scanner entrada = new Scanner(System.in);
+		leerPokedex();
 		menu(entrada);
 
 		entrada.close();
@@ -27,6 +28,40 @@ public class Main {
 	}
 
 	// Menu principal
+
+	static void leerPokedex() {
+		try {
+			File file = new File("txts/Pokedex.txt");
+			Scanner lector = new Scanner(file);
+
+			while (lector.hasNextLine()) {// Dentro de este while solo creo los pokemones de manera que creo instancias
+											// para hacer el randomizado.
+
+				String linea = lector.nextLine();
+				String[] partes = linea.split(";");
+
+				String nombre = partes[0];
+				double intervalo = Double.parseDouble(partes[2]);
+
+				int vida = Integer.parseInt(partes[3]);
+				int ataque = Integer.parseInt(partes[4]);
+				int defensa = Integer.parseInt(partes[5]);
+				int ataqueEspecial = Integer.parseInt(partes[6]);
+				int defensaEspecial = Integer.parseInt(partes[7]);
+				int velocidad = Integer.parseInt(partes[8]);
+
+				int stats = vida + ataque + defensa + ataqueEspecial + defensaEspecial + velocidad;
+				String habitats = partes[1];
+				String tipo = partes[9];
+				Pokemon e = new Pokemon(nombre, habitats, intervalo, stats, tipo, "Vivo");
+				listaPokemonesPc.add(e);
+			}
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+		}
+
+	}
+
 	static void menu(Scanner entrada) {
 		int opcion = 0;
 
@@ -62,14 +97,38 @@ public class Main {
 		try {
 			File file = new File("txts/Registros (1).txt");
 			Scanner lector = new Scanner(file);
-			String linea = lector.nextLine();
-			String[] partes = linea.split(",");
+			
+			
+			String primeralinea = lector.nextLine();
+			String[] partes = primeralinea.split(";");
+			
 			String nombre = partes[0];
+			String medallas = partes[1];
 			Jugador jugadorCargado = new Jugador(nombre);
+			jugadorCargado.setMedallas(medallas);
+			
+			
+			
+			while (lector.hasNextLine()) {
+				String linea = lector.nextLine();
+				String[] partes2 = linea.split(";");
+				String nombrePokemon = partes2[0];
+				String estado = partes2[1];
+				for (Pokemon pokemon : listaPokemonesPc) {
+					if (pokemon.getNombre().equalsIgnoreCase(nombrePokemon)) {
+						pokemon.setEstado(estado);
+						
+						jugadorCargado.agregarPokemon(pokemon, true);
+					}
+				}
+			}
+			
 			lector.close();
 			menUsuario(entrada, jugadorCargado);
-		}catch(Exception e) {
-		System.out.println("ERROR" + e.getMessage());
+			
+			
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
 		}
 	}
 
@@ -124,6 +183,8 @@ public class Main {
 					case 3:
 						revisarPc(entrada, user);
 						break;
+					case 7: 
+						guardarPartida();
 					}
 
 				} while (opcion < 1 || opcion > 8);
@@ -132,7 +193,11 @@ public class Main {
 			}
 		}
 	}
-
+	//Guardar Partida
+	static void guardarPartida() {
+		
+	}
+	
 	// Capturar pokemon
 	static void salirCapturar(Scanner entrada, Jugador user) {
 		String habitat = eligirHabitat(entrada);
@@ -209,39 +274,15 @@ public class Main {
 		double suma = 0;
 
 		try {
-			File file = new File("txts/Pokedex.txt");
-			Scanner lector = new Scanner(file);
-
-			while (lector.hasNextLine()) {// Dentro de este while solo creo los pokemones de manera que creo instancias
-											// para hacer el randomizado.
-
-				String linea = lector.nextLine();
-				String[] partes = linea.split(";");
-
-				String nombre = partes[0];
-				double intervalo = Double.parseDouble(partes[2]);
-
-				int vida = Integer.parseInt(partes[3]);
-				int ataque = Integer.parseInt(partes[4]);
-				int defensa = Integer.parseInt(partes[5]);
-				int ataqueEspecial = Integer.parseInt(partes[6]);
-				int defensaEspecial = Integer.parseInt(partes[7]);
-				int velocidad = Integer.parseInt(partes[8]);
-
-				int stats = vida + ataque + defensa + ataqueEspecial + defensaEspecial + velocidad;
-				String habitats = partes[1];
-				String tipo = partes[9];
-
-				Pokemon e = new Pokemon(nombre, habitats, intervalo, stats, tipo, "Vivo");
-
-				if (habitat.equalsIgnoreCase(partes[1])) {
-					suma += e.getPorcAparicion();
+			for (Pokemon pokemon:listaPokemonesPc) {
+				
+				if (habitat.equalsIgnoreCase(pokemon.getHabitat())) {
+					suma += pokemon.getPorcAparicion();
 					probabilidades.add(suma);
-					pokemonParalela.add(e);
+					pokemonParalela.add(pokemon);
 				}
 			}
 
-			lector.close();
 
 			int indice = 0;
 			for (int i = 1; i < probabilidades.size(); i++) {
@@ -265,7 +306,7 @@ public class Main {
 			switch (opcion) {
 			case 1:
 				if (user.getEquipo().size() < 7) {
-					user.agregarPokemon(pokemonParalela.get(indice));
+					user.agregarPokemon(pokemonParalela.get(indice), false);
 				}
 				break;
 
@@ -274,7 +315,9 @@ public class Main {
 
 			}
 
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			System.out.println("ERROR. No se encontro el archivo " + e.getMessage());
 		}
 
@@ -342,7 +385,7 @@ public class Main {
 				System.out.print("> ");
 				posicion2 = Integer.parseInt(entrada.nextLine());
 			} while (posicion2 < 1 || posicion2 > cantidadP);
-			
+
 			// Lineas a cambiar...
 			String linea1 = conseguirLinea(posicion1);
 			System.out.println(linea1);
@@ -408,8 +451,6 @@ public class Main {
 		return null;
 
 	}
-
-	
 
 }
 

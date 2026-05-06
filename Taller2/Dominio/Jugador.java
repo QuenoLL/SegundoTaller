@@ -7,10 +7,11 @@ public class Jugador {
 
 	private String user;
 	private String medallas;
-	private List<Pokemon> equipo = new ArrayList<Pokemon>();
+	private List<Pokemon> equipo;
 
 	public Jugador(String user) {
 		this.user = user;
+		this.equipo = new ArrayList<Pokemon>();
 	}
 
 	public List<Pokemon> getEquipo() {
@@ -29,17 +30,18 @@ public class Jugador {
 		this.medallas = medallas;
 	}
 
-	public void agregarPokemon(Pokemon e) {
+	public void agregarPokemon(Pokemon e, boolean interruptor) {
 		this.equipo.add(e);
-		System.out.println(equipo.get(equipo.size() - 1).getNombre() + " Capturado con exito!!! XD");
-
+		if (!interruptor) {
+			System.out.println(equipo.get(equipo.size() - 1).getNombre() + " Capturado con exito!!! XD");
+		}
 	}
 
 	public void cambiarEquipo(int posicion1, int posicion2) {
 		Pokemon aux = equipo.get(posicion1 - 1);
 		equipo.set(posicion1 - 1, equipo.get(posicion2 - 1));
 		equipo.set(posicion2 - 1, aux);
-		for(int i = 0; i < equipo.size(); i++) {
+		for (int i = 0; i < equipo.size(); i++) {
 			System.out.println(equipo.get(i).getNombre());
 		}
 	}
