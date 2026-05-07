@@ -6,7 +6,7 @@ import java.util.List;
 public class Jugador {
 
 	private String user;
-	private String medallas;
+	private String medallas = "none";
 	private List<Pokemon> equipo;
 
 	public Jugador(String user) {

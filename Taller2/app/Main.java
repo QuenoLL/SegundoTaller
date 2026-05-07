@@ -109,6 +109,7 @@ public class Main {
 		int opcion = 0;
 
 		System.out.println("1) Continuar\n2) Nueva Partida\n3) Salir");
+		System.out.print("> ");
 
 		try {
 			do {
@@ -208,8 +209,8 @@ public class Main {
 			try {
 				do {
 					System.out.println("\n" + user.getUser() + ", que deseas hacer?");
-					System.out.println(
-							"\n1) Revisar equipo.\n2) Salir a capturar.\n3) Acceso al PC (cambiar Pokemon del equipo).\n4) Retar un gimnasio\n5) Desafío al Alto Mando.\n6) Curar Pokémon.\n7) Guardar.\n8) Guardar y Salir.");
+					System.out.println("\n1) Revisar equipo.\n2) Salir a capturar.\n3) Acceso al PC (cambiar Pokemon del equipo).\n4) Retar un gimnasio\n5) Desafío al Alto Mando.\n6) Curar Pokémon.\n7) Guardar.\n8) Guardar y Salir.");
+					System.out.print("> ");
 					opcion = Integer.parseInt(entrada.nextLine());
 
 					switch (opcion) {
@@ -224,7 +225,7 @@ public class Main {
 						break;
 
 					case 4:
-						retarGimnasio(entrada, user, gym);
+						retarGimnasio(entrada, user);
 						break;
 
 					case 6:
@@ -247,41 +248,62 @@ public class Main {
 	}
 
 	// Formato de reto a gimnasio
-	static void retarGimnasio(Scanner entrada, Jugador user, Gimnasio gym) {
+	static void retarGimnasio(Scanner entrada, Jugador user) {
 
 		try {
 			int contador = 1;
 			int opcion;
-			int medallas = Integer.parseInt(user.getMedallas());
-			boolean estadogym = gym.isEstado();
+			String medalla = user.getMedallas();
+			String estado = null;
 			
+			System.out.println();
 			
-			for (Gimnasio gymnasio : listaGimnasios) {
-				String estado = "Sin derrotar";
-				if (gymnasio.isEstado() == true) {
+			for (Gimnasio gimnasio : listaGimnasios) {
+				estado = "Sin derrotar";
+				if (gimnasio.isEstado() == true) {
 					estado = "Derrotado";
 				}
 				
-				System.out.println( contador + ") " + gymnasio.getLider() + " - Estado: " + estado );
+				System.out.println( contador + ") " + gimnasio.getLider() + " - Estado: " + estado );
 				contador++;
+				
 			}
 			System.out.println("9) Volver al menu.");
 			
 			System.out.print("Ingrese opcion: ");
 			
 			 opcion = Integer.parseInt(entrada.nextLine());
-			 while (opcion == medallas|| opcion!= 0 || estadogym) {
-					 
+			 
+			 switch(opcion) {
+			 case 1:
+				 if(medalla.equalsIgnoreCase("none")) {
+					 System.out.println("Te enfrentaras.");
+				 }else if(listaGimnasios.get(opcion-1).isEstado() == true) {
+					 System.out.println("Ya derrotaste este gimnasio.");
 				 }
+				 break;
 				 
-			 
-			 
-			 
-			 
+			 case 2:
+				 if(medalla.equalsIgnoreCase("EmmaLaArdillaRabiosa")) {
+					 System.out.println("Te enfrentaras");
+				 }else if(listaGimnasios.get(opcion-1).isEstado() == true) {
+					 System.out.println("Ya derrotaste este gimnasio.");
+				 }else System.out.println("Calmado Entrenador!!! No puedes retar a "+listaGimnasios.get(opcion-1).getLider()+" sin haber derrotado a los lideres anteriores!!");
+				 break;
+				 
+			 case 3:
+				 if(medalla.equalsIgnoreCase("MartinNegro")){
+					 System.out.println("Te enfrentaras");
+				 }else if(listaGimnasios.get(opcion-1).isEstado() == true) {
+					 System.out.println("Ya derrotaste este gimnasio.");
+				 }else System.out.println("Calmado Entrenador!!! No puedes retar a "+listaGimnasios.get(opcion-1).getLider()+" sin haber derrotado a los lideres anteriores!!");
+				 break;
+				 
+			 }
 			 
 			
 		} catch (Exception e) {
-			System.out.println("ERROR" + e.getMessage());
+			System.out.println("ERROR " + e.getMessage());
 		}
 	}
 
@@ -458,6 +480,11 @@ public class Main {
 
 	// Printeo del equipo del jugador, los primeros 6 de la pc...
 	static void revisarEquipo(Jugador user) {
+		if(user.getEquipo().size() == 0) {
+			System.out.println("\nAun no capturas ningun Pokemon...");
+			return;
+		}
+		
 		int c = 1;
 		System.out.println();
 		for (Pokemon i : user.getEquipo()) {
