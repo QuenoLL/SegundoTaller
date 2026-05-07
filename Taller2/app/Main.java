@@ -175,9 +175,9 @@ public class Main {
 	// Crear usuario (deriva a menu de usuario)
 	static void crearUsuario(Scanner entrada) {
 		String apodo;
-		System.out.print("Ingrese su Apodo: ");
 
 		do {
+			System.out.print("Ingrese su Apodo: ");
 			apodo = entrada.nextLine();
 		} while (apodo.equals(""));
 
@@ -246,18 +246,48 @@ public class Main {
 			}
 		}
 	}
+	
+	static boolean justificacionEnfrentamiento(int opcion, String medalla) {
+		if(medalla.equalsIgnoreCase("none") && opcion == 1) {
+			System.out.println("\nDesafiando a "+listaGimnasios.get(opcion-1).getLider());
+			return true;
+		}
+		if(medalla.equalsIgnoreCase(listaGimnasios.get(opcion-2).getLider())) {
+			System.out.println("\nDesafiando a "+listaGimnasios.get(opcion-1).getLider());
+			return true;
+		}else if(listaGimnasios.get(opcion-1).isEstado() == true) {
+			System.out.println("\nYa derrotaste este gimnasio");
+		}else {
+			System.out.println("\nCalmado Entrenador!!! No puedes retar a "+listaGimnasios.get(opcion-1).getLider()+" sin haber derrotado a los lideres anteriores!!");
+		}
+		
+		return false;
+	}
+	
+	static void dueloGimnasio(Jugador user, Gimnasio gym) {
+		for(int i = 0; i < user.getEquipo().size() && i < 6; i++) {
+			if(user.getEquipo().get(i).getEstado().equalsIgnoreCase("vivo")) {
+				
+			}
+		}
+	}
 
 	// Formato de reto a gimnasio
 	static void retarGimnasio(Scanner entrada, Jugador user) {
 
 		try {
+			if(user.getEquipo().size() == 0) {
+				System.out.println("\nDebes de capturar Pokemones antes de enfrentarte en duelos!.");
+				return;
+			}
+			
 			int contador = 1;
 			int opcion;
-			String medalla = user.getMedallas();
 			String estado = null;
 			
 			System.out.println();
 			
+			//Printeo Gimnasios en relacion al contador...
 			for (Gimnasio gimnasio : listaGimnasios) {
 				estado = "Sin derrotar";
 				if (gimnasio.isEstado() == true) {
@@ -270,37 +300,25 @@ public class Main {
 			}
 			System.out.println("9) Volver al menu.");
 			
-			System.out.print("Ingrese opcion: ");
+			do {
+				System.out.print("Ingrese opcion: ");
+				opcion = Integer.parseInt(entrada.nextLine());
+			}while(opcion < 1 || opcion > 9);
 			
-			 opcion = Integer.parseInt(entrada.nextLine());
-			 
-			 switch(opcion) {
-			 case 1:
-				 if(medalla.equalsIgnoreCase("none")) {
-					 System.out.println("Te enfrentaras.");
-				 }else if(listaGimnasios.get(opcion-1).isEstado() == true) {
-					 System.out.println("Ya derrotaste este gimnasio.");
-				 }
-				 break;
-				 
-			 case 2:
-				 if(medalla.equalsIgnoreCase("EmmaLaArdillaRabiosa")) {
-					 System.out.println("Te enfrentaras");
-				 }else if(listaGimnasios.get(opcion-1).isEstado() == true) {
-					 System.out.println("Ya derrotaste este gimnasio.");
-				 }else System.out.println("Calmado Entrenador!!! No puedes retar a "+listaGimnasios.get(opcion-1).getLider()+" sin haber derrotado a los lideres anteriores!!");
-				 break;
-				 
-			 case 3:
-				 if(medalla.equalsIgnoreCase("MartinNegro")){
-					 System.out.println("Te enfrentaras");
-				 }else if(listaGimnasios.get(opcion-1).isEstado() == true) {
-					 System.out.println("Ya derrotaste este gimnasio.");
-				 }else System.out.println("Calmado Entrenador!!! No puedes retar a "+listaGimnasios.get(opcion-1).getLider()+" sin haber derrotado a los lideres anteriores!!");
-				 break;
-				 
-			 }
-			 
+			//Condicion enfrentamiento o salida...
+			if(opcion == 9) {
+				return;
+			}else {
+				if(justificacionEnfrentamiento(opcion, user.getMedallas()) == true) {
+					dueloGimnasio(user, listaGimnasios.get(opcion-1));
+				}else {
+					return;
+				}
+			}
+			
+			
+			
+			
 			
 		} catch (Exception e) {
 			System.out.println("ERROR " + e.getMessage());
@@ -458,10 +476,18 @@ public class Main {
 			System.out.println("Ingrese opcion: ");
 			int opcion = Integer.parseInt(entrada.nextLine());
 
-			switch (opcion) {
+			switch (opcion) {//Arreglar manera que si esta en el equipo no se agregue, lo cual pasa pero en el retunr de la funcion mayor se sobrescribe en el registro.
+			
 			case 1:
-				if (user.getEquipo().size() < 7) {
-					user.agregarPokemon(pokemonParalela.get(indice), false);
+				
+				for(Pokemon pokemon : user.getEquipo()) {
+					if(pokemonParalela.get(indice).getNombre().equalsIgnoreCase(pokemon.getNombre())) {
+						System.out.println("Ya tienes este pokemon!!!");
+						break;
+					}else {
+						user.agregarPokemon(pokemonParalela.get(indice), false);
+						break;
+					}
 				}
 				break;
 
@@ -470,9 +496,7 @@ public class Main {
 
 			}
 
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			System.out.println("ERROR. No se encontro el archivo " + e.getMessage());
 		}
 
