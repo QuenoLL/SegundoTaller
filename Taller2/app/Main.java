@@ -224,7 +224,7 @@ public class Main {
 						break;
 
 					case 4:
-						retarGimnasio();
+						retarGimnasio(entrada, user, gym);
 						break;
 
 					case 6:
@@ -247,20 +247,44 @@ public class Main {
 	}
 
 	// Formato de reto a gimnasio
-	static void retarGimnasio() {
+	static void retarGimnasio(Scanner entrada, Jugador user, Gimnasio gym) {
 
 		try {
 			int contador = 1;
-			for (Gimnasio gym : listaGimnasios) {
+			int opcion;
+			int medallas = Integer.parseInt(user.getMedallas());
+			boolean estadogym = gym.isEstado();
+			
+			
+			for (Gimnasio gymnasio : listaGimnasios) {
+				String estado = "Sin derrotar";
+				if (gymnasio.isEstado() == true) {
+					estado = "Derrotado";
+				}
 				
-				System.out.println( contador + ") " + gym.getLider() + " - Estado: " );
+				System.out.println( contador + ") " + gymnasio.getLider() + " - Estado: " + estado );
 				contador++;
 			}
 			System.out.println("9) Volver al menu.");
+			
+			System.out.print("Ingrese opcion: ");
+			
+			 opcion = Integer.parseInt(entrada.nextLine());
+			 while (opcion == medallas|| opcion!= 0 || estadogym) {
+					 
+				 }
+				 
+			 
+			 
+			 
+			 
+			 
+			
 		} catch (Exception e) {
 			System.out.println("ERROR" + e.getMessage());
 		}
 	}
+
 
 	// Guardar Partida
 
@@ -297,6 +321,8 @@ public class Main {
 			System.out.println("ERROR. " + e.getMessage());
 		}
 	}
+	
+	
 
 	static void curarPokemon(Jugador user) {
 		for (Pokemon pokemon : user.getEquipo()) {
@@ -308,7 +334,7 @@ public class Main {
 
 	// Capturar pokemon
 	static void salirCapturar(Scanner entrada, Jugador user) {
-		String habitat = eligirHabitat(entrada);
+		String habitat = elegirHabitat(entrada);
 		captura(entrada, habitat, user);
 
 		try {
@@ -329,7 +355,7 @@ public class Main {
 	}
 
 	// Derivada de Captura
-	static String eligirHabitat(Scanner entrada) {
+	static String elegirHabitat(Scanner entrada) {
 		int opcion;
 		int c = 0;
 		List<String> habitats = new ArrayList<String>();
