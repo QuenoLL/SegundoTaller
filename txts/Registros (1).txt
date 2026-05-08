@@ -1,4 +1,3 @@
-lalo;none
-Ludicolo;Vivo
-Whiscash;Vivo
-Victreebel;Vivo
+eugenio;none
+Spiritomb;Vivo
+Reshiram;Vivo
