@@ -33,7 +33,7 @@ public class Jugador {
 	public void agregarPokemon(Pokemon e, boolean interruptor) {
 		this.equipo.add(e);
 		if (!interruptor) {
-			System.out.println(equipo.get(equipo.size() - 1).getNombre() + " Capturado con exito!!! XD");
+			System.out.println("\n"+equipo.get(equipo.size() - 1).getNombre() + " Capturado con exito!!! XD");
 		}
 	}
 

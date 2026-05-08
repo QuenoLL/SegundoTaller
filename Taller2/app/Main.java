@@ -2,13 +2,13 @@
 package app;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import Dominio.AltoMando;
 import Dominio.Gimnasio;
 import Dominio.Jugador;
 import Dominio.Pokemon;
@@ -18,7 +18,7 @@ public class Main {
 
 	static List<Pokemon> listaPokemonesPc = new ArrayList<Pokemon>();
 	static List<Gimnasio> listaGimnasios = new ArrayList<Gimnasio>();
-	static TablaTipos tablaTipos;
+	static List<AltoMando> listaAltoMando = new ArrayList<AltoMando>();
 
 	public static void main(String[] args) {
 		// Nombre: Eugenio Cortés Egaña; Rut: 22.405.687-7
@@ -27,6 +27,7 @@ public class Main {
 		Scanner entrada = new Scanner(System.in);
 		leerPokedex();
 		leerGimnasios();
+		leerAltoMando();
 		menu(entrada);
 
 		entrada.close();
@@ -34,6 +35,38 @@ public class Main {
 	}
 
 	// Menu principal
+	
+	static void leerAltoMando() {
+		try {
+			File file = new File("txts/Alto Mando.txt");
+			Scanner lector = new Scanner(file);
+			
+			while(lector.hasNextLine()) {
+				String linea = lector.nextLine();
+				String[] partes = linea.split(";");
+				
+				int numAltoMando = Integer.parseInt(partes[0]);
+				String nombre = partes[1];
+				List<Pokemon> listaPokemon = new ArrayList<Pokemon>();
+				
+				for(int i = 2; i < 8; i++) {
+					for(Pokemon pokemon: listaPokemonesPc) {
+						if(pokemon.getNombre().equalsIgnoreCase(partes[i])) {
+							listaPokemon.add(pokemon);
+							
+						}
+					}
+				}
+				
+				AltoMando a = new AltoMando(numAltoMando, nombre, listaPokemon);
+				listaAltoMando.add(a);
+			}
+			lector.close();
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. "+e.getMessage());
+		}
+	}
 
 	static void leerPokedex() {
 		try {
@@ -91,7 +124,6 @@ public class Main {
 
 						if (pokemon.getNombre().equalsIgnoreCase(partes[i + 4])) {
 							pokemones.add(pokemon);
-
 						}
 					}
 
@@ -164,6 +196,15 @@ public class Main {
 					}
 				}
 			}
+			
+			if(!medallas.equalsIgnoreCase("none")) {
+				for(Gimnasio gym : listaGimnasios) {
+					if(gym.getLider().equalsIgnoreCase(medallas)) {
+						gym.setEstado(true);
+						break;
+					}else gym.setEstado(true);
+				}
+			}
 
 			lector.close();
 			menUsuario(entrada, jugadorCargado);
@@ -229,27 +270,33 @@ public class Main {
 					case 4:
 						retarGimnasio(entrada, user);
 						break;
-
+					case 5:
+						altoMando(user,entrada);
+						break;
 					case 6:
 						curarPokemon(user);
 						break;
 					case 7:
-						guardarPartida(indicador);
+						guardarPartida(user,indicador);
 						break;
 					case 8:
-						guardarPartida(indicador);
+						guardarPartida(user,indicador);
 						indicador = true;
 						break;
 					}
 
 				} while (opcion < 1 || opcion > 8);
 			} catch (Exception e) {
-				System.out.println("ERROR. jjj" + e.getMessage());
+				System.out.println("ERROR. " + e.getMessage());
 			}
 		}
 	}
 
 	static boolean justificacionEnfrentamiento(int opcion, String medalla) {
+		if(listaGimnasios.get(opcion-1).isEstado()) {
+			System.out.println("\nYa derrotaste este gimnasio");
+			return false;
+		}
 		if (medalla.equalsIgnoreCase("none") && opcion == 1) {
 			System.out.println("\nDesafiando a " + listaGimnasios.get(opcion - 1).getLider());
 			return true;
@@ -270,6 +317,7 @@ public class Main {
 	static void dueloGimnasio(Jugador user, Gimnasio gym) {
 		List<Integer> indicesPokemonesVivos = new ArrayList<Integer>();
 		List<Integer> indicesPokemonesGym = new ArrayList<Integer>();
+		boolean indicador = true;
 
 		for (int i = 0; i < gym.getListaPokemon().size(); i++) {
 			indicesPokemonesGym.add(i);
@@ -286,29 +334,43 @@ public class Main {
 		if (indicesPokemonesVivos.size() == 0) {
 			System.out.println("Tu equipo entero esta debilitado, ve a curarlos ya!!!.");
 		} else {
+			
 			// Comienzo del match ciclico hasta que haya un ganador...
-			while (true) {
+			while (indicador) {
 				boolean derrota = false;
-				System.out.println("\n Que deseas hacer?");
+				int accion = 0;
+				
+				System.out.println("\nQue deseas hacer?\n");
 				System.out.println("1) Atacar");
 				System.out.println("2) Cambiar de pokemon");
 				System.out.println("3) Rendirse");
-				System.out.println("Ingrese opción: ");
-				int accion = Integer.parseInt(entrada.nextLine());
+				
+				try {
+					do {
+						System.out.println("Ingrese opción: ");
+						accion = Integer.parseInt(entrada.nextLine());
+					}while(accion < 1 || accion > 3);
+				}catch(Exception e) {
+					System.out.println("ERROR "+e.getMessage());
+				}
+				
 				switch (accion) {
 				case 1:
-
+					int indiceActualGym = indicesPokemonesGym.getFirst();
+					
 					String namePokemon = user.getEquipo().get(indicesPokemonesVivos.getFirst()).getNombre();
-					String gymPokemon = gym.getListaPokemon().getFirst().getNombre();
+					String gymPokemon = gym.getListaPokemon().get(indiceActualGym).getNombre();
+					
 					int statsMyPokemon = user.getEquipo().get(indicesPokemonesVivos.getFirst()).getStats();
-					int statsGymPokemon = gym.getListaPokemon().getFirst().getStats();
+					int statsGymPokemon = gym.getListaPokemon().get(indiceActualGym).getStats();
 
 					System.out.println(namePokemon + " -> " + statsMyPokemon);
 					System.out.println(gymPokemon + " -> " + statsGymPokemon);
+					System.out.println();
 
-					double efectividad = tablaTipos.getEfectividad(
+					double efectividad = TablaTipos.getEfectividad(
 							user.getEquipo().get(indicesPokemonesVivos.getFirst()).getTipo(),
-							gym.getListaPokemon().getFirst().getTipo());
+							gym.getListaPokemon().get(indiceActualGym).getTipo());
 
 					if (efectividad == 0.5) {
 						statsMyPokemon *= efectividad;
@@ -340,67 +402,103 @@ public class Main {
 							derrota = true;
 						}
 					}
+					System.out.println();
 
 					if (derrota) {
-						System.out.println("Ha ganado" + gymPokemon + "!" + namePokemon + " ha sido derrotado");
+						System.out.println("Ha ganado " + gymPokemon + "! " + namePokemon + " ha sido derrotado");
 						user.getEquipo().get(indicesPokemonesVivos.getFirst()).setEstado("Debilitado");
+						indicesPokemonesVivos.removeFirst();
 						
-						indicesPokemonesVivos.remove(0);
 					} else {
-						System.out.println("Ha ganado" + namePokemon + "!" + gymPokemon + " ha sido derrotado");
-						indicesPokemonesGym.remove(0);
+						System.out.println("Ha ganado " + namePokemon + "! " + gymPokemon + " ha sido derrotado");
+						indicesPokemonesGym.removeFirst();
 
 					}
 
 					if (indicesPokemonesVivos.size() != 0 && indicesPokemonesGym.size() == 0) {
 						gym.setEstado(true);
+						indicador = false;
 						System.out.println("Has derrotado a " + gym.getLider());
 						user.setMedallas(gym.getLider());
+						agregarMedalla(user, gym, true);
+						
 					} else if (indicesPokemonesVivos.size() == 0 && indicesPokemonesGym.size() != 0) {
 						System.out.println("Te ha derrotado " + gym.getLider());
-						return;
+						indicador = false;
+						agregarMedalla(user, gym, false);
 					}
+					
+					break;
+					
+				case 2:
+					int opcion;
+					
+					System.out.println("----POKEMONES VIVOS DE TU EQUIPO----");
+					for(int i = 0; i < indicesPokemonesVivos.size(); i++) {
+						int indice = indicesPokemonesVivos.get(i);
+						System.out.println((i+1)+") "+ user.getEquipo().get(indice).getNombre());
+					}
+					
+					do {
+						System.out.print("Ingresa el numero del pokemon que quieres cambiar: ");
+						opcion = Integer.parseInt(entrada.nextLine());
+					}while(opcion < 0 || opcion > indicesPokemonesVivos.size());
+					
+					int aux = indicesPokemonesVivos.get(0);
+					indicesPokemonesVivos.set(0, indicesPokemonesVivos.get(opcion-1));
+					indicesPokemonesVivos.set(opcion - 1, aux);
+					
+					break;
+				case 3:
+					System.out.println("Sales hecho una bala!!!");
+					indicador = false;
+					break;
 
 				}
 
 			}
 		}
-		entrada.close();
 	}
 
 	// Sobreescribir medallas, está incompleto, requiere continuación y revisión
-	static void agregarMedalla(Jugador user, Gimnasio gym) {
-			try {
-				// Lectura del archivo y llenado del array
+	static void agregarMedalla(Jugador user, Gimnasio gym,boolean indicador) {
+		try {
+			
+			// Lectura del archivo y llenado del array
+			File file = new File("txts/Registros (1).txt");
+			Scanner lector = new Scanner(file);
+			String lineaSaltada = lector.nextLine();
 
-				File file = new File("txts/Registros (1).txt");
-				Scanner lector = new Scanner(file);
-				String lineaSaltada = lector.nextLine();
-
-				List<String> escrituraArchivo = new ArrayList<String>();
-				while (lector.hasNextLine()) {
-					String linea = lector.nextLine();
-					escrituraArchivo.add(linea);
-				}
-
-				String arch = "txts/Registros (1).txt";
-				FileWriter escritor = new FileWriter(arch);
-				String[] partes = lineaSaltada.split(";");
-				String nombre = partes[0];
-				String medallas = partes[1];
-				
-				String nuevaLinea = nombre + gym.getLider();
-	
-				escritor.write(nuevaLinea);
-				
-				for (int i = 0; i < escrituraArchivo.size(); i++) {
-					escritor.write("\n" + escrituraArchivo.get(i));
-				}
-				escritor.close();
-				
-			}catch (Exception e) {
-				System.out.println("ERROR" + e.getMessage());
+			List<String> escrituraArchivo = new ArrayList<String>();
+			
+			while (lector.hasNextLine()) {
+				String linea = lector.nextLine();
+				escrituraArchivo.add(linea);
 			}
+			
+			lector.close();
+
+			//Sobrescritura de archivo;
+			String arch = "txts/Registros (1).txt";
+			FileWriter escritor = new FileWriter(arch);
+			String[] partes = lineaSaltada.split(";");
+			String nombre = partes[0];
+			String nuevaLinea = null;
+
+			if(indicador) {
+				nuevaLinea = nombre +";"+ gym.getLider();
+			}else nuevaLinea = nombre +";"+user.getMedallas();
+
+			escritor.write(nuevaLinea);
+
+			for (int i = 0; i < escrituraArchivo.size(); i++) {
+				escritor.write("\n" + user.getEquipo().get(i).getNombre() + ";" + user.getEquipo().get(i).getEstado());
+			}
+			escritor.close();
+
+		} catch (Exception e) {
+			System.out.println("ERROR" + e.getMessage());
+		}
 	}
 
 	// Formato de reto a gimnasio
@@ -453,7 +551,7 @@ public class Main {
 	}
 
 	// Guardar Partida
-	static void guardarPartida(boolean indicador) {
+	static void guardarPartida(Jugador user, boolean indicador) {
 		try {
 			// Lectura del archivo y llenado del array
 
@@ -471,7 +569,7 @@ public class Main {
 			FileWriter escritor = new FileWriter(arch);
 			escritor.write(lineaSaltada);
 			for (int i = 0; i < escrituraArchivo.size(); i++) {
-				escritor.write("\n" + escrituraArchivo.get(i));
+				escritor.write("\n" + user.getEquipo().get(i).getNombre() + ";" + user.getEquipo().get(i).getEstado());
 			}
 			escritor.close();
 
@@ -547,7 +645,7 @@ public class Main {
 			lector.close();
 
 			do {
-				System.out.println("Ingrese Zona: ");
+				System.out.print("Ingrese Zona: ");
 				opcion = Integer.parseInt(entrada.nextLine());
 			} while (opcion < 1 || opcion > c);
 
@@ -640,7 +738,7 @@ public class Main {
 			break;
 
 		case 2:
-			break;
+			return false;
 
 		}
 
@@ -658,12 +756,21 @@ public class Main {
 		int c = 1;
 		System.out.println();
 		for (Pokemon i : user.getEquipo()) {
-			System.out.println(c + "|" + i.getNombre() + "|" + i.getTipo() + "|Stats totales: " + i.getStats());
+			if(c == 7) {
+				return;
+			}else {
+				System.out.println(c + "|" + i.getNombre() + "|" + i.getTipo() + "|Stats totales: " + i.getStats());
+			}
 			c++;
 		}
 	}
 
 	static void revisarPc(Scanner entrada, Jugador user) {
+		
+		if(user.getEquipo().size() == 0) {
+			System.out.println("\nAun no tienes pokemones en el inventario. SAL A CAPTURAR!");
+			return;
+		}
 
 		try {
 			File file = new File("txts/Registros (1).txt");
@@ -739,15 +846,12 @@ public class Main {
 
 				if (linea.equalsIgnoreCase(linea1)) {
 					escrituraArchivo.add(linea2);
-					System.out.println("CAMBIÉ");
 
 				} else if (linea.equalsIgnoreCase(linea2)) {
 					escrituraArchivo.add(linea1);
-					System.out.println("CAMBIÉ");
 
 				} else {
 					escrituraArchivo.add(linea);
-					System.out.println("ESTOY CAMBIANDO");
 				}
 			}
 			lector.close();
@@ -789,6 +893,151 @@ public class Main {
 
 		return null;
 
+	}
+	
+	static void altoMando(Jugador user, Scanner entrada) {
+		if(!user.getMedallas().equalsIgnoreCase("Maxi")) {
+			System.out.println("\nAun no derrotas a todos los gimnasios, que haces aca???");
+			return;
+		}else {
+			dueloAltoMando(user,entrada);
+		}
+	}
+
+	private static void dueloAltoMando(Jugador user,Scanner entrada) {
+		boolean indicador = true;
+		boolean acabado = false;
+		
+		for(AltoMando altoMando : listaAltoMando) {
+			List<Integer> indicesPokemonesVivos = new ArrayList<Integer>();
+			List<Integer> indicesPokemonesAlto = new ArrayList<Integer>();
+			
+			for (int i = 0; i < user.getEquipo().size() && i < 6; i++) {
+				if (user.getEquipo().get(i).getEstado().equalsIgnoreCase("vivo")) {
+					indicesPokemonesVivos.add(i);
+				}
+			}
+			
+			for (int i = 0; i < altoMando.getListaPokemon().size(); i++) {
+				indicesPokemonesAlto.add(i);
+			}
+			
+			if (indicesPokemonesVivos.size() == 0) {
+				System.out.println("Tu equipo entero esta debilitado, ve a curarlos ya!!!.");
+			} else {
+				System.out.println("\nDesafiando a: " + altoMando.getNombre());
+				
+				while(indicador) {
+					boolean derrota = false;
+					
+					int accion = 0;
+					
+					System.out.println("\nQue deseas hacer?\n");
+					System.out.println("1) Atacar");
+					System.out.println("2) Cambiar de pokemon");
+					System.out.println("3) Rendirse");
+					
+					try {
+						do {
+							System.out.println("Ingrese opción: ");
+							accion = Integer.parseInt(entrada.nextLine());
+						}while(accion < 1 || accion > 3);
+					}catch(Exception e) {
+						System.out.println("ERROR "+e.getMessage());
+					}
+					
+					switch (accion) {
+					case 1:
+						int indiceActualAlto = indicesPokemonesAlto.getFirst();
+						
+						String namePokemon = user.getEquipo().get(indicesPokemonesVivos.getFirst()).getNombre();
+						String altoPokemon = altoMando.getListaPokemon().get(indiceActualAlto).getNombre();
+						
+						int statsMyPokemon = user.getEquipo().get(indicesPokemonesVivos.getFirst()).getStats();
+						int statsAltoPokemon = altoMando.getListaPokemon().get(indiceActualAlto).getStats();
+
+						System.out.println(namePokemon + " -> " + statsMyPokemon);
+						System.out.println(altoPokemon + " -> " + statsAltoPokemon);
+						System.out.println();
+						
+						double efectividad = TablaTipos.getEfectividad(
+								user.getEquipo().get(indicesPokemonesVivos.getFirst()).getTipo(),
+								altoMando.getListaPokemon().get(indiceActualAlto).getTipo());
+
+						if (efectividad == 0.5) {
+							statsMyPokemon *= efectividad;
+							System.out.println(namePokemon + " no es efectivo contra " + altoPokemon);
+							System.out.println("Nuevo puntaje: ");
+							System.out.println(namePokemon + " -> " + statsMyPokemon);
+							System.out.println(altoPokemon + " -> " + statsAltoPokemon);
+							if (statsMyPokemon < statsAltoPokemon) {
+								derrota = true;
+							}
+						}
+						
+						if (efectividad == 1.0) {
+							statsMyPokemon *= efectividad;
+							System.out.println(namePokemon + " no tiene efectos adicionales a " + altoPokemon);
+							System.out.println("Nuevo puntaje: ");
+							System.out.println(namePokemon + " -> " + statsMyPokemon);
+							System.out.println(altoPokemon + " -> " + statsAltoPokemon);
+							if (statsMyPokemon < statsAltoPokemon) {
+								derrota = true;
+							}
+						}
+						
+						if (efectividad == 2.0) {
+							statsMyPokemon *= efectividad;
+							System.out.println(namePokemon + "es muy efectivo contra " + altoPokemon);
+							System.out.println("Nuevo puntaje: ");
+							System.out.println(namePokemon + " -> " + statsMyPokemon);
+							System.out.println(altoPokemon + " -> " + statsAltoPokemon);
+							if (statsMyPokemon < statsAltoPokemon) {
+								derrota = true;
+							}
+						}
+						
+						System.out.println();
+						
+						if (derrota) {
+							System.out.println("Ha ganado " + altoPokemon + "! " + namePokemon + " ha sido derrotado");
+							user.getEquipo().get(indicesPokemonesVivos.getFirst()).setEstado("Debilitado");
+							indicesPokemonesVivos.removeFirst();
+							
+						} else {
+							System.out.println("Ha ganado " + namePokemon + "! " + altoPokemon + " ha sido derrotado");
+							indicesPokemonesAlto.removeFirst();
+						}
+						
+						System.out.println();
+						
+						if (indicesPokemonesVivos.size() != 0 && indicesPokemonesAlto.size() == 0) {
+							indicador = false;
+							System.out.println("Has derrotado a " + altoMando.getNombre());
+
+						} else if (indicesPokemonesVivos.size() == 0 && indicesPokemonesAlto.size() != 0) {
+							System.out.println("Te ha derrotado " + altoMando.getNombre());
+							indicador = false;
+							acabado = true;
+						}
+						
+						break;
+
+					
+					}
+					
+				}
+							
+			}
+			if(acabado) {
+				System.out.println("\nNo te quedan pokemones vivos has sido derrotado y pisado...");
+				return;
+			}
+
+		}
+		if(!acabado) {
+			System.out.println("Felicidades eres el jugador Experto EASY, ganaste la copa coca cola.");			
+		}
 	}
 
 }

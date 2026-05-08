@@ -2,7 +2,6 @@ package Dominio;
 
 import java.util.ArrayList;
 import java.util.List;
-
 public class Gimnasio {
 	private int numGimnasio;
 	private String lider;
@@ -47,7 +46,6 @@ public class Gimnasio {
 
 	public List<Pokemon> getListaPokemon() {
 		return listaPokemon;
-		
 	}
 
 

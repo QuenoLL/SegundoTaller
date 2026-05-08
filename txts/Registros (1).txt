@@ -1,3 +1,2 @@
-eugenio;none
-Spiritomb;Vivo
-Reshiram;Vivo
+manu;Maxi
+Mewtwo;Vivo
