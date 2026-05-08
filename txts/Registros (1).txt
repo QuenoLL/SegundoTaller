@@ -1,2 +1,4 @@
 lalo;none
-Magikarp;Vivo
+Ludicolo;Vivo
+Whiscash;Vivo
+Victreebel;Vivo

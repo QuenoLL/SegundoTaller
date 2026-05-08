@@ -109,10 +109,10 @@ public class Main {
 		int opcion = 0;
 
 		System.out.println("1) Continuar\n2) Nueva Partida\n3) Salir");
-		System.out.print("> ");
 
 		try {
 			do {
+				System.out.print("> ");
 				opcion = Integer.parseInt(entrada.nextLine());
 
 				switch (opcion) {
@@ -136,7 +136,6 @@ public class Main {
 	}
 
 	// Continuar carga datos y deriva a menú de usuario
-
 	static void continuarMenu(Scanner entrada) {
 		try {
 			File file = new File("txts/Registros (1).txt");
@@ -242,7 +241,7 @@ public class Main {
 
 				} while (opcion < 1 || opcion > 8);
 			} catch (Exception e) {
-				System.out.println("ERROR. Valor Ingresado erroneo " + e.getMessage());
+				System.out.println("ERROR. jjj" + e.getMessage());
 			}
 		}
 	}
@@ -265,8 +264,19 @@ public class Main {
 	}
 	
 	static void dueloGimnasio(Jugador user, Gimnasio gym) {
+		List<Integer> indicesPokemonesVivos = new ArrayList<Integer>();
+		
 		for(int i = 0; i < user.getEquipo().size() && i < 6; i++) {
 			if(user.getEquipo().get(i).getEstado().equalsIgnoreCase("vivo")) {
+				indicesPokemonesVivos.add(i);
+			}
+		}
+		
+		if(indicesPokemonesVivos.size() == 0) {
+			System.out.println("Tu equipo entero esta debilitado, ve a curarlos ya!!!.");
+		}else {
+			//Comienzo del match ciclico hasta que haya un ganador...
+			while(true) {
 				
 			}
 		}
@@ -325,9 +335,7 @@ public class Main {
 		}
 	}
 
-
 	// Guardar Partida
-
 	static void guardarPartida(boolean indicador) {
 		try {
 			// Lectura del archivo y llenado del array
@@ -350,11 +358,11 @@ public class Main {
 			}
 			escritor.close();
 
-			if (indicador = false) {
+			if (!indicador) {
 				System.out.println("\nPARTIDA GUARDADA EXITOSAMENTE!!!!!!!!!!!!!");
 
 			} else
-				System.out.println("\n SALISTE Y GUARDASTE EXITOSAMENTE LA PARTIDA");
+				System.out.println("\nSALISTE Y GUARDASTE EXITOSAMENTE LA PARTIDA");
 
 			lector.close();
 		} catch (Exception e) {
@@ -362,8 +370,7 @@ public class Main {
 		}
 	}
 	
-	
-
+	//Curar Pokemones.
 	static void curarPokemon(Jugador user) {
 		for (Pokemon pokemon : user.getEquipo()) {
 			pokemon.setEstado("Vivo");
@@ -375,21 +382,25 @@ public class Main {
 	// Capturar pokemon
 	static void salirCapturar(Scanner entrada, Jugador user) {
 		String habitat = elegirHabitat(entrada);
-		captura(entrada, habitat, user);
+		boolean indicador = captura(entrada, habitat, user);
+		
+		if(indicador) {
 
-		try {
-			String arch = "txts/Registros (1).txt";
-			FileWriter escritor = new FileWriter(arch, true);
-			Pokemon ultimo = user.getEquipo().get(user.getEquipo().size() - 1);
-			escritor.write("\n" + ultimo.getNombre() + ";" + ultimo.getEstado());// Agrega la linea con salto en linea
-																					// "\n" de modo que llamo a los
-																					// atrubutos del pokemon.
-			escritor.close();
-
-			System.out.println("\n" + ultimo.getNombre() + " ha sido agregado a tu equipo! XD");
-
-		} catch (Exception e) {
-			System.out.println("ERROR. Registro fallido " + e.getMessage());
+			try {
+				String arch = "txts/Registros (1).txt";
+				FileWriter escritor = new FileWriter(arch, true);
+				Pokemon ultimo = user.getEquipo().get(user.getEquipo().size() - 1);
+				escritor.write("\n" + ultimo.getNombre() + ";" + ultimo.getEstado());// Agrega la linea con salto en linea
+																						// "\n" de modo que llamo a los
+																						// atrubutos del pokemon.
+				escritor.close();
+	
+				System.out.println("\n" + ultimo.getNombre() + " ha sido agregado a tu equipo! XD");
+	
+			} catch (Exception e) {
+				System.out.println("ERROR. " + e.getMessage());
+			}
+			
 		}
 
 	}
@@ -427,14 +438,14 @@ public class Main {
 			return eleccion;
 
 		} catch (Exception e) {
-			System.out.println("ERROR. No se pudo hayar el archivo " + e.getMessage());
+			System.out.println("ERROR. " + e.getMessage());
 			return null;
 		}
 
 	}
 
 	// Captura Pokemom (ejercicio)
-	static void captura(Scanner entrada, String habitat, Jugador user) {
+	static boolean captura(Scanner entrada, String habitat, Jugador user) {
 		Random r = new Random();
 		double minimo = 0;
 		double maximo = 1.0;
@@ -446,59 +457,74 @@ public class Main {
 		List<Pokemon> pokemonParalela = new ArrayList<Pokemon>();
 
 		double suma = 0;
+		int opcion = 0;;
 
+		for (Pokemon pokemon : listaPokemonesPc) {
+
+			if (habitat.equalsIgnoreCase(pokemon.getHabitat())) {
+				suma += pokemon.getPorcAparicion();
+				probabilidades.add(suma);
+				pokemonParalela.add(pokemon);
+			}
+		}
+
+		int indice = 0;
+		for (int i = 1; i < probabilidades.size(); i++) {
+			if (num < probabilidades.get(i) && num > probabilidades.get(i - 1)) {
+				indice = i;
+				break;
+			} else if (num < probabilidades.get(i) && num > 0) {
+				indice = 0;
+				break;
+			}
+		}
+
+		System.out.printf("\nOH!!! Ha aparecido un increible %s salvaje!!!",
+				pokemonParalela.get(indice).getNombre());
+
+		System.out.println("\n¿Que deseas hacer?\n");
+		System.out.println("1) Capturar\n2) Huir");
+		
+		//Control de error entrada de archivo.
 		try {
-			for (Pokemon pokemon : listaPokemonesPc) {
-
-				if (habitat.equalsIgnoreCase(pokemon.getHabitat())) {
-					suma += pokemon.getPorcAparicion();
-					probabilidades.add(suma);
-					pokemonParalela.add(pokemon);
-				}
-			}
-
-			int indice = 0;
-			for (int i = 1; i < probabilidades.size(); i++) {
-				if (num < probabilidades.get(i) && num > probabilidades.get(i - 1)) {
-					indice = i;
-					break;
-				} else if (num < probabilidades.get(i) && num > 0) {
-					indice = 0;
-					break;
-				}
-			}
-
-			System.out.printf("\nOH!!! Ha aparecido un increible %s salvaje!!!",
-					pokemonParalela.get(indice).getNombre());
-
-			System.out.println("\n¿Que deseas hacer?\n");
-			System.out.println("1) Capturar\n2) Huir");
-			System.out.println("Ingrese opcion: ");
-			int opcion = Integer.parseInt(entrada.nextLine());
-
-			switch (opcion) {//Arreglar manera que si esta en el equipo no se agregue, lo cual pasa pero en el retunr de la funcion mayor se sobrescribe en el registro.
 			
-			case 1:
-				
+			do {
+				System.out.println("Ingrese opcion: ");
+				opcion = Integer.parseInt(entrada.nextLine());
+			}while(opcion < 1 || opcion > 2);
+			
+		}catch(Exception e) {
+			System.out.println("ERROR. "+e.getMessage());
+		}
+
+		switch (opcion) {//Arreglar manera que si esta en el equipo no se agregue, lo cual pasa pero en el return de la funcion mayor se sobrescribe en el registro.
+		case 1:
+			
+			if(user.getEquipo().size() > 0) {
+				boolean yaLoTiene = false;
 				for(Pokemon pokemon : user.getEquipo()) {
 					if(pokemonParalela.get(indice).getNombre().equalsIgnoreCase(pokemon.getNombre())) {
-						System.out.println("Ya tienes este pokemon!!!");
-						break;
-					}else {
-						user.agregarPokemon(pokemonParalela.get(indice), false);
+						yaLoTiene = true;
 						break;
 					}
 				}
-				break;
+				
+				if(yaLoTiene) {
+					System.out.println("Ya tienes a este pokemon!!!.");
+					return false;
+				}else {
+					user.agregarPokemon(pokemonParalela.get(indice), false);
+				}
+			}else user.agregarPokemon(pokemonParalela.get(indice), false);
+			
+			break;
 
-			case 2:
-				menUsuario(entrada, user);
+		case 2:
+			break;
 
-			}
-
-		} catch (Exception e) {
-			System.out.println("ERROR. No se encontro el archivo " + e.getMessage());
 		}
+		
+		return true;
 
 	}
 
