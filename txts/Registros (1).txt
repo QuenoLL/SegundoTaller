@@ -1,1 +1,4 @@
 onichan;none
+Whiscash;Vivo
+Zubat;Vivo
+Reshiram;Vivo

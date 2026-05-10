@@ -821,7 +821,7 @@ public class Main {
 
 			switch (opcion) {
 			case 1:
-				cambiarPokemon(entrada, user, c);
+				cambiarPokemon(entrada, user, user.getEquipo().size());
 				break;
 			case 2:
 				break;
@@ -834,23 +834,32 @@ public class Main {
 
 	// Cambiamos Pokemones que tenemos guardados en nuestro pc
 	static void cambiarPokemon(Scanner entrada, Jugador user, int cantidadP) {
-		int posicion1, posicion2;
+		int posicion1 = 0, posicion2 = 0;
 		if (user.getEquipo().size() < 2) {
 			System.out.println("Para cambiar pokemones necesitas más de 1");
 			return;
 		}
 
 		try {
+			
 			do {
-				System.out.println("Ingrese su posicion 1 a intercambiar:");
-				System.out.print("> ");
-				posicion1 = Integer.parseInt(entrada.nextLine());
+				try {
+					System.out.println("Ingrese su posicion 1 a intercambiar:");
+					System.out.print("> ");
+					posicion1 = Integer.parseInt(entrada.nextLine());
+				}catch (Exception e) {
+					System.out.println("ERROR " + e.getMessage());
+				}
 			} while (posicion1 < 1 || posicion1 > cantidadP);
 
 			do {
-				System.out.println("Ingrese su posicion 2 a intercambiar:");
-				System.out.print("> ");
-				posicion2 = Integer.parseInt(entrada.nextLine());
+				try {
+					System.out.println("Ingrese su posicion 2 a intercambiar:");
+					System.out.print("> ");
+					posicion2 = Integer.parseInt(entrada.nextLine());
+				}catch (Exception e) {
+					System.out.println("ERROR " + e.getMessage());
+				}
 			} while (posicion2 < 1 || posicion2 > cantidadP);
 
 			// Lineas a cambiar...
